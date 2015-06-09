@@ -1,4 +1,8 @@
-Parse.initialize("obDHGL7K1Fmen951R5ezXvECakKrVVeCg3fNwLYg", "MSgkDUlpCg4mlDNcva1VjAcZoLVXLHPBHA286omP");
+var parseId = "obDHGL7K1Fmen951R5ezXvECakKrVVeCg3fNwLYg"
+var parseKey = "MSgkDUlpCg4mlDNcva1VjAcZoLVXLHPBHA286omP"
+var parseAPIKey = "W6ZiXjTuOPBpILFGKS9Z0DrI2sYNJVqGy7wrtGd3"
+
+Parse.initialize(parseId, parseKey);
 
 var PageContent = React.createClass({
     getInitialState: function() {

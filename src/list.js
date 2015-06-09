@@ -1,8 +1,49 @@
 
 navigator.getMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+var width = 320
+var height
+var imageContentType = "image/jpeg"
 
-function startRecording() {
-    var video = document.querySelector('#video')
+var ListItem = React.createClass({
+    takePhotoPressed: function(e) {
+        e.preventDefault()
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+        var data = canvas.toDataURL(imageContentType)
+        data = data.substring(data.indexOf(',')+1);
+        var jsonData = { "base64":data.toString(),"_ContentType":imageContentType};
+        var props = this.props
+        var serverUrl = 'https://api.parse.com/1/files/' + "dayImage.jpeg";
+        $.ajax({
+            type: "POST",
+            beforeSend: function(request) {
+                request.setRequestHeader("X-Parse-Application-Id", parseId);
+                request.setRequestHeader("X-Parse-REST-API-Key", parseAPIKey);
+                request.setRequestHeader("Content-Type", imageContentType);
+            },
+            url: serverUrl,
+            data: JSON.stringify(jsonData),
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                console.table(data)
+                console.table(props)
+                props.day.set("photoURL",data.url)
+                props.day.save()
+            },
+            error: function(data) {
+                var obj = jQuery.parseJSON(data);
+                alert(obj.error);
+            }
+        });
+        
+        //photo.setAttribute('src', data);
+    },
+    
+    startCapturePressed: function(e) {
+      e.preventDefault()
+      var video = document.querySelector('#video')
     var streaming = false
     
     video.addEventListener('canplay', function(ev){
@@ -29,28 +70,28 @@ function startRecording() {
       console.log("An error occured! " + err);
     }
   );
-
-}
-
-
-var ListItem = React.createClass({
-    startCapturePressed: function(e) {
-      e.preventDefault()
-      startRecording()
       console.log("TEST")
     },
     render: function() {
         var videoElement
-        
         if(this.props.day.get("date") === dateToday()) {
             videoElement = <div>
-                <video id="video" /><button id="startbutton" onClick={this.startCapturePressed}>Start capture</button>
+                    <canvas id="canvas" />
+                    <video id="video" />
+                    <button id="startbutton" onClick={this.startCapturePressed}>Start capture</button>
+                    <button id="doneButtone" onClick={this.takePhotoPressed}>take photo</button>
                 </div>
         }
+        var imageElement
+        if(this.props.day.get("photoURL").length > 0) {
+            imageElement = <img src={this.props.day.get("photoURL")} />
+        }
+        
       return (
             <li>
                 {this.props.day.get("date")} 
                 {videoElement}
+                {imageElement}
             </li>
       )}
 });
