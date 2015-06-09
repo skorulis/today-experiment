@@ -1,20 +1,43 @@
-Parse.initialize("obDHGL7K1Fmen951R5ezXvECakKrVVeCg3fNwLYg", "MSgkDUlpCg4mlDNcva1VjAcZoLVXLHPBHA286omP");
-
 var RegisterForm = React.createClass({
+	handleSubmit: function(e) {
+    	e.preventDefault();
+    	var username = React.findDOMNode(this.refs.username).value.trim();
+    	var password = React.findDOMNode(this.refs.password).value.trim();
+    	var confirm = React.findDOMNode(this.refs.confirmPassword).value.trim();
+    	var email = React.findDOMNode(this.refs.email).value.trim();
+    	console.log("register " + username)
+    	
+        var user = new Parse.User();
+        user.set("username", username);
+        user.set("password", password);
+        user.set("email", email);
+        
+        user.signUp(null, {
+            success: function(user) {
+            console.log("sign up " + this.props.onRegisterComplete)
+            this.props.onRegisterComplete(user)
+        },
+        error: function(user, error) {
+            alert("Error: " + error.code + " " + error.message);
+        }
+        });
+        
+		return;
+	},
 	render: function() {
 	return (
-		<form id="register-form" >
+		<form id="register-form" onSubmit={this.handleSubmit}>
 			<div className="form-group">
-				<input type="text" name="username" id="username" tabIndex="1" className="form-control" placeholder="Username" value=""/>
+				<input type="text" name="username" ref="username" tabIndex="1" className="form-control" placeholder="Username" />
 			</div>
 			<div className="form-group">
-				<input type="email" name="email" id="email" tabIndex="1" className="form-control" placeholder="Email Address" value=""/>
+				<input type="email" name="email" ref="email" tabIndex="1" className="form-control" placeholder="Email Address" />
 			</div>
 			<div className="form-group">
-				<input type="password" name="password" id="password" tabIndex="2" className="form-control" placeholder="Password"/>
+				<input type="password" name="password" ref="password" tabIndex="2" className="form-control" placeholder="Password"/>
 			</div>
 			<div className="form-group">
-				<input type="password" name="confirm-password" id="confirm-password" tabIndex="2" className="form-control" placeholder="Confirm Password"/>
+				<input type="password" name="confirm-password" ref="confirmPassword" tabIndex="2" className="form-control" placeholder="Confirm Password"/>
 			</div>
 			<div className="form-group">
 				<div className="row">
@@ -32,7 +55,7 @@ var LoginForm = React.createClass({
 	return (
 		<form id="login-form" >
 			<div className="form-group">
-				<input type="text" name="username" id="username" tabIndex="1" className="form-control" placeholder="Username" value="" />
+				<input type="text" name="username" id="username" tabIndex="1" className="form-control" placeholder="Username" />
 			</div>
 			<div className="form-group">
 				<input type="password" name="password" id="password" tabIndex="2" className="form-control" placeholder="Password" />
@@ -48,40 +71,26 @@ var LoginForm = React.createClass({
 					</div>
 				</div>
 			</div>
-			<div className="form-group">
-				<div className="row">
-					<div className="col-lg-12">
-						<div className="text-center">
-							<a href="http://phpoll.com/recover" tabIndex="5" className="forgot-password">Forgot Password?</a>
-						</div>
-					</div>
-				</div>
-			</div>
 		</form>
 	);}
 });
 
 var UserForm = React.createClass({
-	handleSubmit: function(e) {
-    	e.preventDefault();
-    	var username = React.findDOMNode(this.refs.username).value.trim();
-    	var password = React.findDOMNode(this.refs.password).value.trim();
-    	var email = React.findDOMNode(this.refs.email).value.trim();
-    	this.props.onRegisterSubmit(username,password,email)
-		return;
-	},
+	getInitialState: function() {
+        return { registerDisplay: "asdfsdf" };
+    },
 	registerPressed: function(e) {
 		$("#register-form").delay(100).fadeIn(100);
  		$("#login-form").fadeOut(100);
 		$('#login-form-link').removeClass('active');
-		$(this).addClass('active');
+		$('#register-form-link').addClass('active');
 		e.preventDefault();
 	},
 	loginPressed: function(e) {
 		$("#login-form").delay(100).fadeIn(100);
  		$("#register-form").fadeOut(100);
 		$('#register-form-link').removeClass('active');
-		$(this).addClass('active');
+		$('#login-form-link').addClass('active');
 		e.preventDefault();
 	},
 	render: function() {
@@ -104,8 +113,8 @@ var UserForm = React.createClass({
 					<div className="panel-body">
 						<div className="row">
 							<div className="col-lg-12">
-								<LoginForm />
-								<RegisterForm />
+								<LoginForm  />
+								<RegisterForm onRegisterComplete={this.props.onRegisterComplete} />
 							</div>
 						</div>
 					</div>
