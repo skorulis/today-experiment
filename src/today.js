@@ -20,7 +20,7 @@ var PageContent = React.createClass({
   render: function() {
     return (
       <div className="content">
-		<RegisterElement onRegisterSubmit={this.handleRegisterSubmit}/>
+		<UserForm onRegisterSubmit={this.handleRegisterSubmit}/>
       </div>
     );
   }
