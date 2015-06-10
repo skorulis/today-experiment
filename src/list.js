@@ -4,7 +4,7 @@ var width = 320
 var height
 var imageContentType = "image/jpeg"
 
-var ListItem = React.createClass({
+var DayElement = React.createClass({
     takePhotoPressed: function(e) {
         e.preventDefault()
         canvas.width = width;
@@ -70,7 +70,6 @@ var ListItem = React.createClass({
       console.log("An error occured! " + err);
     }
   );
-      console.log("TEST")
     },
     render: function() {
         var videoElement
@@ -83,13 +82,13 @@ var ListItem = React.createClass({
                 </div>
         }
         var imageElement
-        if(this.props.day.get("photoURL").length > 0) {
+        if(this.props.day.get("photoURL") != null) {
             imageElement = <img src={this.props.day.get("photoURL")} />
         }
         
       return (
-            <li>
-                {this.props.day.get("date")} 
+            <li className="list-group list-unstyled day" >
+                <h3>{this.props.day.get("date")} {this.props.day.timestamp()} </h3>
                 {videoElement}
                 {imageElement}
             </li>
@@ -97,6 +96,9 @@ var ListItem = React.createClass({
 });
 
 var ContentList = React.createClass({
+    updateState: function(days) {
+        this.setState({days:days})
+    },
     getInitialState: function() {
         return {days:[]  }
     },
@@ -104,6 +106,7 @@ var ContentList = React.createClass({
         e.preventDefault() 
         var today = new Day()
         today.set("date",dateToday())
+        today.set("timestamp",today.timestamp())
         today.set("parent",this.props.user)
         today.save()
     },
@@ -112,10 +115,10 @@ var ContentList = React.createClass({
         var query = new Parse.Query(Day);
         var component = this
         query.equalTo("parent",this.props.user)
+        query.ascending("date")
         query.find({
             success: function(results) {
-                console.table(results)     
-                component.setState({days:results})
+                component.updateState(results)
             },
             error: function(error) {
                 console.log("error " + error)
@@ -124,13 +127,20 @@ var ContentList = React.createClass({
     },
 
   render: function() {
+      var nextDayAdd
+      var prevDayAdd
+      
+      
+      
       return (
       <div className="list">
         <h2> {this.props.user.get("username")} </h2>
-        <a href="#" onClick={this.addDayPressed}><i className="fa fa-plus-circle"></i></a>
+        <button type="button" className="btn btn-default" aria-label="Left Align">
+            <span className="fa fa-plus-circle" aria-hidden="true">TEST</span>
+        </button>
         <ul> {this.props.user.get("days")} 
         {this.state.days.map(function(day,i) {
-            return <ListItem day={day} key={day.get("date")} />
+            return <DayElement day={day} key={day.get("date")} />
         })}
     
         </ul>
