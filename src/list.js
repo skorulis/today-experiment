@@ -8,9 +8,9 @@ var DayElement = React.createClass({
     getInitialState: function() {
         return {recording:false}
     },
-    takePhotoPressed: function(e) {
-        e.preventDefault()
-        
+    takePhotoPressed: function() {
+        var video = document.querySelector('#video')
+        var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
@@ -45,7 +45,11 @@ var DayElement = React.createClass({
     },
     startCapturePressed: function(e) {
         e.preventDefault()
-        this.setState({recording:true})
+        if(this.state.recording) {
+            this.takePhotoPressed()   
+        } else {
+            this.setState({recording:true})
+        }
     },
     
     startCapture: function() {
@@ -55,8 +59,6 @@ var DayElement = React.createClass({
         video.addEventListener('canplay', function(ev){
             if (!streaming) {
                 height = video.videoHeight / (video.videoWidth/width);
-                video.setAttribute('width', width);
-                video.setAttribute('height', height);
                 streaming = true;
             }
         }, false);
@@ -81,29 +83,27 @@ var DayElement = React.createClass({
     },
     render: function() {
         var videoElement
-        if(this.state.recording) {
-            videoElement = <div>
-                    <canvas id="canvas" />
-                    <video id="video" />
-                    <button id="doneButtone" onClick={this.takePhotoPressed}>take photo</button>
-                </div>
-        }
         var imageElement
-        if(this.state.imageData != null) {
-            imageElement = <img src={this.state.imageData} />
-        } else if(this.props.day.get("photoURL") != null) {
-            imageElement = <img src={this.props.day.get("photoURL")} />
-        } 
+        if(this.state.recording) {
+            videoElement = <video id="video" className="dayImageItem" z-index="2" />
+        } else {
+            if(this.state.imageData != null) {
+                imageElement = <img src={this.state.imageData} className="dayImageItem" z-index="1" />
+            } else if(this.props.day.get("photoURL") != null) {
+                imageElement = <img src={this.props.day.get("photoURL")} className="dayImageItem" z-index="1" />
+            }   
+        }
+         
         
       return (
             <li className="list-group list-unstyled day" >
                 <h3>{this.props.day.formattedDate()}</h3>
-                <div>
-                    <button type="button" className="btn btn-default" aria-label="Left Align" onClick={this.startCapturePressed}>
-                        <span className="fa fa-camera" aria-hidden="true"></span>
-                    </button>
+                <div className="dayImageContainer">
                     {videoElement}
                     {imageElement}
+                    <button type="button" className="btn btn-default captureButton" aria-label="Left Align" onClick={this.startCapturePressed}>
+                        <span className="fa fa-camera" aria-hidden="true"></span>
+                    </button>
                 </div>
                 
                 
