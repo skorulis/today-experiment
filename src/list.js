@@ -73,7 +73,7 @@ var DayElement = React.createClass({
     },
     render: function() {
         var videoElement
-        if(this.props.day.get("date") === dateToday()) {
+        if(this.props.day.get("date") === Day.dateToday()) {
             videoElement = <div>
                     <canvas id="canvas" />
                     <video id="video" />
@@ -105,7 +105,7 @@ var ContentList = React.createClass({
     addDayPressed: function(e) {
         e.preventDefault() 
         var today = new Day()
-        today.set("date",dateToday())
+        today.set("date",Day.dateToday())
         today.set("timestamp",today.timestamp())
         today.set("parent",this.props.user)
         today.save()
