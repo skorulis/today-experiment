@@ -5,14 +5,18 @@ var height
 var imageContentType = "image/jpeg"
 
 var DayElement = React.createClass({
+    getInitialState: function() {
+        return {recording:false}
+    },
     takePhotoPressed: function(e) {
         e.preventDefault()
+        
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
-        var data = canvas.toDataURL(imageContentType)
-        data = data.substring(data.indexOf(',')+1);
-        var jsonData = { "base64":data.toString(),"_ContentType":imageContentType};
+        var originalData = canvas.toDataURL(imageContentType)
+        var strippedData = originalData.substring(originalData.indexOf(',')+1);
+        var jsonData = { "base64":strippedData.toString(),"_ContentType":imageContentType};
         var props = this.props
         var serverUrl = 'https://api.parse.com/1/files/' + "dayImage.jpeg";
         $.ajax({
@@ -27,8 +31,6 @@ var DayElement = React.createClass({
             processData: false,
             contentType: false,
             success: function(data) {
-                console.table(data)
-                console.table(props)
                 props.day.set("photoURL",data.url)
                 props.day.save()
             },
@@ -37,60 +39,74 @@ var DayElement = React.createClass({
                 alert(obj.error);
             }
         });
+        this.setState({recording:false,imageData:originalData})
         
         //photo.setAttribute('src', data);
     },
-    
     startCapturePressed: function(e) {
-      e.preventDefault()
-      var video = document.querySelector('#video')
-    var streaming = false
-    
-    video.addEventListener('canplay', function(ev){
-    if (!streaming) {
-      height = video.videoHeight / (video.videoWidth/width);
-      video.setAttribute('width', width);
-      video.setAttribute('height', height);
-      streaming = true;
-    }
-  }, false);
-    
-    navigator.getMedia(
-    { video: true, audio: false },
-    function(stream) {
-      if (navigator.mozGetUserMedia) {
-        video.mozSrcObject = stream;
-      } else {
-        var vendorURL = window.URL || window.webkitURL;
-        video.src = vendorURL.createObjectURL(stream);
-      }
-      video.play();
+        e.preventDefault()
+        this.setState({recording:true})
     },
-    function(err) {
-      console.log("An error occured! " + err);
-    }
-  );
+    
+    startCapture: function() {
+        var video = document.querySelector('#video')
+        var streaming = false
+    
+        video.addEventListener('canplay', function(ev){
+            if (!streaming) {
+                height = video.videoHeight / (video.videoWidth/width);
+                video.setAttribute('width', width);
+                video.setAttribute('height', height);
+                streaming = true;
+            }
+        }, false);
+    
+        navigator.getMedia({ video: true, audio: false },function(stream) {
+            if (navigator.mozGetUserMedia) {
+                video.mozSrcObject = stream;
+            } else {
+                var vendorURL = window.URL || window.webkitURL;
+                video.src = vendorURL.createObjectURL(stream);
+            }
+            video.play();
+        },
+            function(err) { console.log("An error occured! " + err); }
+        );
+    },
+    componentDidUpdate: function(prevProps, prevState) {
+        console.log("Will update " + this.state.recording)
+        if(this.state.recording) {
+            this.startCapture()   
+        }
     },
     render: function() {
         var videoElement
-        if(this.props.day.get("date") === Day.dateToday()) {
+        if(this.state.recording) {
             videoElement = <div>
                     <canvas id="canvas" />
                     <video id="video" />
-                    <button id="startbutton" onClick={this.startCapturePressed}>Start capture</button>
                     <button id="doneButtone" onClick={this.takePhotoPressed}>take photo</button>
                 </div>
         }
         var imageElement
-        if(this.props.day.get("photoURL") != null) {
+        if(this.state.imageData != null) {
+            imageElement = <img src={this.state.imageData} />
+        } else if(this.props.day.get("photoURL") != null) {
             imageElement = <img src={this.props.day.get("photoURL")} />
-        }
+        } 
         
       return (
             <li className="list-group list-unstyled day" >
                 <h3>{this.props.day.formattedDate()}</h3>
-                {videoElement}
-                {imageElement}
+                <div>
+                    <button type="button" className="btn btn-default" aria-label="Left Align" onClick={this.startCapturePressed}>
+                        <span className="fa fa-camera" aria-hidden="true"></span>
+                    </button>
+                    {videoElement}
+                    {imageElement}
+                </div>
+                
+                
             </li>
       )}
 });
