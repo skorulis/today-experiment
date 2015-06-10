@@ -4,9 +4,38 @@ var width = 320
 var height
 var imageContentType = "image/jpeg"
 
+var TaskEntryElement = React.createClass({
+    handleSubmit: function(e) {
+      e.preventDefault()
+      var task = React.findDOMNode(this.refs.newTask).value.trim();
+      React.findDOMNode(this.refs.newTask).value = ''
+      this.props.onTaskSubmit(task)
+    },
+    render: function() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                    <input type="text" name="newTask" ref="newTask" tabIndex="1" className="form-control" placeholder="Add something" defaultValue="" />
+            </form>
+    );}
+});
+
+var TaskElement = React.createClass({
+    render: function() {
+        return (
+            <li>{this.props.text}</li>
+    );}
+});
+
 var DayElement = React.createClass({
     getInitialState: function() {
         return {recording:false}
+    },
+    handleTaskSubmit: function(task) {
+        console.log("TEST" + task) 
+        this.props.day.get("tasks").unshift(0)
+        this.props.day.get("tasks")[0] = task
+        this.props.day.save()
+        this.setState({})
     },
     takePhotoPressed: function() {
         var video = document.querySelector('#video')
@@ -40,8 +69,6 @@ var DayElement = React.createClass({
             }
         });
         this.setState({recording:false,imageData:originalData})
-        
-        //photo.setAttribute('src', data);
     },
     startCapturePressed: function(e) {
         e.preventDefault()
@@ -93,7 +120,6 @@ var DayElement = React.createClass({
                 imageElement = <img src={this.props.day.get("photoURL")} className="dayImageItem" z-index="1" />
             }   
         }
-         
         
       return (
             <li className="list-group list-unstyled day" >
@@ -105,6 +131,12 @@ var DayElement = React.createClass({
                         <span className="fa fa-camera" aria-hidden="true"></span>
                     </button>
                 </div>
+                <TaskEntryElement onTaskSubmit={this.handleTaskSubmit} />
+                <ul>
+                {this.props.day.get("tasks").map(function(task,i) {
+                    return <TaskElement text={task} key={i} />
+                })}
+                </ul>
                 
                 
             </li>
@@ -124,6 +156,7 @@ var ContentList = React.createClass({
             var today = new Day()
             today.set("date",Day.dateToday())
             today.set("parent",this.props.user)
+            today.set("tasks",[])
             days.unshift(0)
             days[0] = today
         }
@@ -138,6 +171,7 @@ var ContentList = React.createClass({
         var day = new Day()
         day.set("date",this.state.bottomTime)
         day.set("parent",this.props.user)
+        day.set("tasks",[])
         day.save()
         this.state.days.push(day)
         this.updateState(this.state.days)
