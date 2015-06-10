@@ -20,9 +20,18 @@ var TaskEntryElement = React.createClass({
 });
 
 var TaskElement = React.createClass({
+    deletePressed: function(e) {
+        e.preventDefault()
+        console.table(this.props)
+        this.props.onDelete(this.props.index)
+    },
     render: function() {
         return (
-            <li>{this.props.text}</li>
+            <li>{this.props.text}
+                <button type="button" className="btn btn-default" aria-label="Left Align" onClick={this.deletePressed}>
+                        <span className="fa fa-minus-circle" aria-hidden="true"></span>
+                    </button>
+            </li>
     );}
 });
 
@@ -34,6 +43,11 @@ var DayElement = React.createClass({
         console.log("TEST" + task) 
         this.props.day.get("tasks").unshift(0)
         this.props.day.get("tasks")[0] = task
+        this.props.day.save()
+        this.setState({})
+    },
+    handleDeleteTask: function(index) {
+        this.props.day.get("tasks").splice(index,1)
         this.props.day.save()
         this.setState({})
     },
@@ -103,7 +117,6 @@ var DayElement = React.createClass({
         );
     },
     componentDidUpdate: function(prevProps, prevState) {
-        console.log("Will update " + this.state.recording)
         if(this.state.recording) {
             this.startCapture()   
         }
@@ -111,6 +124,7 @@ var DayElement = React.createClass({
     render: function() {
         var videoElement
         var imageElement
+        var list = this
         if(this.state.recording) {
             videoElement = <video id="video" className="dayImageItem" z-index="2" />
         } else {
@@ -134,7 +148,7 @@ var DayElement = React.createClass({
                 <TaskEntryElement onTaskSubmit={this.handleTaskSubmit} />
                 <ul>
                 {this.props.day.get("tasks").map(function(task,i) {
-                    return <TaskElement text={task} key={i} />
+                    return <TaskElement text={task} key={i} index={i} onDelete={list.handleDeleteTask} />
                 })}
                 </ul>
                 
