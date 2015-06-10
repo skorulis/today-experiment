@@ -1,26 +1,33 @@
 var Day = Parse.Object.extend("Day", {
-    timestamp: function() {
-        return Date.parse(this.get("date"))
+    dateYesterday: function() {
+        var date = this.get("date")
+        return new Date(
+            date.getFullYear(), 
+            date.getMonth(), 
+            date.getDate() - 1,
+            date.getHours(),
+            date.getMinutes(),
+            date.getSeconds(),
+            date.getMilliseconds()
+        );
+    },
+    formattedDate: function() {
+        return this.get("date").toDateString()   
     }
     
 },
                               
 {
     dateToday: function() {
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
-        var yyyy = today.getFullYear();
-
-        if(dd<10) {
-            dd='0'+dd
-        } 
-
-        if(mm<10) {
-            mm='0'+mm
-        } 
-
-        return dd+'/'+mm+'/'+yyyy;
+        
+        return this.truncateDate(new Date());
+    },
+    truncateDate: function(date) {
+        date.setHours(0)
+        date.setMinutes(0)
+        date.setSeconds(0)
+        date.setMilliseconds(0)
+        return date
     }
     
 });

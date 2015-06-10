@@ -88,7 +88,7 @@ var DayElement = React.createClass({
         
       return (
             <li className="list-group list-unstyled day" >
-                <h3>{this.props.day.get("date")} {this.props.day.timestamp()} </h3>
+                <h3>{this.props.day.formattedDate()}</h3>
                 {videoElement}
                 {imageElement}
             </li>
@@ -97,25 +97,41 @@ var DayElement = React.createClass({
 
 var ContentList = React.createClass({
     updateState: function(days) {
-        this.setState({days:days})
+        var firstDate
+        if(days.length > 0) {
+            firstDate = days[0].get("date")   
+        }
+        var today = Day.dateToday()
+        console.log(firstDate)
+        if(firstDate == null || firstDate.getDay() !== today.getDay() || firstDate.getMonth() !== today.getMonth() || firstDate.getYear() !== today.getYear()) {
+            console.log("Adding today")
+            var today = new Day()
+            today.set("date",Day.dateToday())
+            today.set("parent",this.props.user)
+            days.unshift(0)
+            days[0] = today
+        }
+        var lastDay = days[days.length-1]
+        this.setState({days:days,bottomTime:lastDay.dateYesterday()})
     },
     getInitialState: function() {
         return {days:[]  }
     },
     addDayPressed: function(e) {
-        e.preventDefault() 
-        var today = new Day()
-        today.set("date",Day.dateToday())
-        today.set("timestamp",today.timestamp())
-        today.set("parent",this.props.user)
-        today.save()
+        e.preventDefault()
+        var day = new Day()
+        day.set("date",this.state.bottomTime)
+        day.set("parent",this.props.user)
+        day.save()
+        this.state.days.push(day)
+        this.updateState(this.state.days)
     },
     
     componentDidMount: function() {
         var query = new Parse.Query(Day);
         var component = this
         query.equalTo("parent",this.props.user)
-        query.ascending("date")
+        query.descending("date")
         query.find({
             success: function(results) {
                 component.updateState(results)
@@ -127,23 +143,23 @@ var ContentList = React.createClass({
     },
 
   render: function() {
-      var nextDayAdd
-      var prevDayAdd
-      
-      
-      
+      var bottomButton
+      if(this.state.bottomTime != null) {
+        bottomButton = 
+            <button type="button" className="btn btn-default" aria-label="Left Align" onClick={this.addDayPressed}>
+                <span className="fa fa-plus-circle" aria-hidden="true"> {this.state.bottomTime.toDateString()}</span>
+            </button>
+      }
       return (
       <div className="list">
         <h2> {this.props.user.get("username")} </h2>
-        <button type="button" className="btn btn-default" aria-label="Left Align">
-            <span className="fa fa-plus-circle" aria-hidden="true">TEST</span>
-        </button>
+        
         <ul> {this.props.user.get("days")} 
         {this.state.days.map(function(day,i) {
             return <DayElement day={day} key={day.get("date")} />
         })}
-    
         </ul>
+        {bottomButton}
       </div>
     );
   }
