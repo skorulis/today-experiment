@@ -9,7 +9,7 @@ var HeaderElement = React.createClass({
         logoutButton = <a href="#" className="navbar-link" onClick={this.logoutPressed}><p className="navbar-text navbar-right">Signed in as {this.props.user.get("username")}</p></a>
     }
     return (
-        <nav className="navbar navbar-default">
+        <nav className="navbar navbar-default" role="navigation">
             <div className="container-fluid">
                 <a className="navbar-brand" href="#">Today</a>
             </div>
