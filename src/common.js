@@ -10,8 +10,9 @@ var HeaderElement = React.createClass({
     }
     return (
         <nav className="navbar navbar-default" role="navigation">
+        
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">Today</a>
+                <a className="navbar-brand" href="#"><img src="img/icon-28.png" />  Today</a>
             </div>
         {logoutButton}
             

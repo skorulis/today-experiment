@@ -10,8 +10,9 @@ var HeaderElement = React.createClass({displayName: "HeaderElement",
     }
     return (
         React.createElement("nav", {className: "navbar navbar-default", role: "navigation"}, 
+        
             React.createElement("div", {className: "container-fluid"}, 
-                React.createElement("a", {className: "navbar-brand", href: "#"}, "Today")
+                React.createElement("a", {className: "navbar-brand", href: "#"}, React.createElement("img", {src: "img/icon-28.png"}), "  Today")
             ), 
         logoutButton
             
