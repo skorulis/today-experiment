@@ -1,6 +1,6 @@
 
-.day {
-    
+#register-form {
+    display: none;
 }
 
 .dayImageContainer {
@@ -17,7 +17,23 @@
 
 .captureButton {
     z-index: 4;
+    width:320px;
+    height: 240px;    
     position: absolute;
+    display: none;
+    opacity: 0.4;
+}
+
+.taskDelete {
+ display:none;   
+}
+
+.taskItem:hover .taskDelete {
+    display: inline;   
+}
+
+.dayImageContainer:hover .captureButton {
+    display: block;   
 }
 
 .panel-login {

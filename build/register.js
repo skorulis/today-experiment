@@ -5,17 +5,16 @@ var RegisterForm = React.createClass({displayName: "RegisterForm",
     	var password = React.findDOMNode(this.refs.password).value.trim();
     	var confirm = React.findDOMNode(this.refs.confirmPassword).value.trim();
     	var email = React.findDOMNode(this.refs.email).value.trim();
-    	console.log("register " + username)
     	
         var user = new Parse.User();
         user.set("username", username);
         user.set("password", password);
         user.set("email", email);
         
+        var owner = this;
         user.signUp(null, {
             success: function(user) {
-            console.log("sign up " + this.props.onRegisterComplete)
-            this.props.onRegisterComplete(user)
+                owner.props.onLogin(user)
         },
         error: function(user, error) {
             alert("Error: " + error.code + " " + error.message);
@@ -31,18 +30,18 @@ var RegisterForm = React.createClass({displayName: "RegisterForm",
 				React.createElement("input", {type: "text", name: "username", ref: "username", tabIndex: "1", className: "form-control", placeholder: "Username"})
 			), 
 			React.createElement("div", {className: "form-group"}, 
-				React.createElement("input", {type: "email", name: "email", ref: "email", tabIndex: "1", className: "form-control", placeholder: "Email Address"})
+				React.createElement("input", {type: "email", name: "email", ref: "email", tabIndex: "2", className: "form-control", placeholder: "Email Address"})
 			), 
 			React.createElement("div", {className: "form-group"}, 
-				React.createElement("input", {type: "password", name: "password", ref: "password", tabIndex: "2", className: "form-control", placeholder: "Password"})
+				React.createElement("input", {type: "password", name: "password", ref: "password", tabIndex: "3", className: "form-control", placeholder: "Password"})
 			), 
 			React.createElement("div", {className: "form-group"}, 
-				React.createElement("input", {type: "password", name: "confirm-password", ref: "confirmPassword", tabIndex: "2", className: "form-control", placeholder: "Confirm Password"})
+				React.createElement("input", {type: "password", name: "confirmPassword", ref: "confirmPassword", tabIndex: "4", className: "form-control", placeholder: "Confirm Password"})
 			), 
 			React.createElement("div", {className: "form-group"}, 
 				React.createElement("div", {className: "row"}, 
 					React.createElement("div", {className: "col-sm-6 col-sm-offset-3"}, 
-						React.createElement("input", {type: "submit", name: "register-submit", id: "register-submit", tabIndex: "4", className: "form-control btn btn-register", value: "Register Now"})
+						React.createElement("input", {type: "submit", name: "register-submit", id: "register-submit", tabIndex: "5", className: "form-control btn btn-register", value: "Register Now"})
 					)
 				)
 			)
@@ -51,14 +50,30 @@ var RegisterForm = React.createClass({displayName: "RegisterForm",
 });
 
 var LoginForm = React.createClass({displayName: "LoginForm",
+    handleSubmit: function(e) {
+        e.preventDefault();
+        var username = React.findDOMNode(this.refs.username).value.trim();
+        var password = React.findDOMNode(this.refs.password).value.trim();
+        
+        var owner = this;
+        Parse.User.logIn(username, password, {
+            success: function(user) {
+                owner.props.onLogin(user)
+            },
+            error: function(user, error) {
+                alert("Error: " + error.code + " " + error.message);
+            }
+        });
+        
+    },
 	render: function() {
 	return (
-		React.createElement("form", {id: "login-form"}, 
+		React.createElement("form", {id: "login-form", onSubmit: this.handleSubmit}, 
 			React.createElement("div", {className: "form-group"}, 
-				React.createElement("input", {type: "text", name: "username", id: "username", tabIndex: "1", className: "form-control", placeholder: "Username"})
+				React.createElement("input", {type: "text", name: "username", ref: "username", tabIndex: "1", className: "form-control", placeholder: "Username"})
 			), 
 			React.createElement("div", {className: "form-group"}, 
-				React.createElement("input", {type: "password", name: "password", id: "password", tabIndex: "2", className: "form-control", placeholder: "Password"})
+				React.createElement("input", {type: "password", name: "password", ref: "password", tabIndex: "2", className: "form-control", placeholder: "Password"})
 			), 
 			React.createElement("div", {className: "form-group text-center"}, 
 				React.createElement("input", {type: "checkbox", tabIndex: "3", className: "", name: "remember", id: "remember"}), 
@@ -113,8 +128,8 @@ var UserForm = React.createClass({displayName: "UserForm",
 					React.createElement("div", {className: "panel-body"}, 
 						React.createElement("div", {className: "row"}, 
 							React.createElement("div", {className: "col-lg-12"}, 
-								React.createElement(LoginForm, null), 
-								React.createElement(RegisterForm, {onRegisterComplete: this.props.onRegisterComplete})
+								React.createElement(LoginForm, {onLogin: this.props.onLogin}), 
+								React.createElement(RegisterForm, {onRegisterComplete: this.props.onLogin})
 							)
 						)
 					)

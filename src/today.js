@@ -9,8 +9,13 @@ var PageContent = React.createClass({
         console.log("User " + Parse.User.current())
         return { currentUser: Parse.User.current() };
     },
-    handleRegisterComplete: function(user) {
+    handleLogin: function(user) {
+        this.setState({ currentUser: Parse.User.current() })
 		console.log("register " + user)			
+    },
+    handleLogout: function() {
+        Parse.User.logOut();
+        this.setState({currentUser:null})
     },
   render: function() {
       var mainView;
@@ -18,20 +23,23 @@ var PageContent = React.createClass({
         if(this.state.currentUser != null) {
             mainView = <ContentList user={this.state.currentUser} />
         } else {
-            mainView = <UserForm onRegisterComplete={this.handleRegisterComplete}/>    
+            mainView = <UserForm onLogin={this.handleLogin}/>    
         }
       
     return (
-      <div className="content">
-        {mainView}
-      </div>
+        <div>
+            <HeaderElement user={this.state.currentUser} onLogout={this.handleLogout} />
+            <div className="content">
+                {mainView}
+            </div>
+        </div>
     );
   }
 });
 
 React.render(
   <PageContent />,
-  document.getElementById('example')
+  document.getElementsByTagName ('body')[0]
 );
 
 console.log("ready ")

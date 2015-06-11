@@ -1,7 +1,7 @@
 
 navigator.getMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 var width = 320
-var height
+var height = 240
 var imageContentType = "image/jpeg"
 
 var TaskEntryElement = React.createClass({displayName: "TaskEntryElement",
@@ -14,7 +14,7 @@ var TaskEntryElement = React.createClass({displayName: "TaskEntryElement",
     render: function() {
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
-                    React.createElement("input", {type: "text", name: "newTask", ref: "newTask", tabIndex: "1", className: "form-control", placeholder: "Add something", defaultValue: ""})
+                React.createElement("input", {type: "text", name: "newTask", ref: "newTask", tabIndex: "1", className: "form-control", placeholder: "Add something", defaultValue: ""})
             )
     );}
 });
@@ -27,8 +27,8 @@ var TaskElement = React.createClass({displayName: "TaskElement",
     },
     render: function() {
         return (
-            React.createElement("li", null, this.props.text, 
-                React.createElement("button", {type: "button", className: "btn btn-default", "aria-label": "Left Align", onClick: this.deletePressed}, 
+            React.createElement("li", {className: "taskItem"}, this.props.text, 
+                React.createElement("button", {type: "button", className: "btn btn-default taskDelete", "aria-label": "Left Align", onClick: this.deletePressed}, 
                         React.createElement("span", {className: "fa fa-minus-circle", "aria-hidden": "true"})
                     )
             )
@@ -40,7 +40,6 @@ var DayElement = React.createClass({displayName: "DayElement",
         return {recording:false}
     },
     handleTaskSubmit: function(task) {
-        console.log("TEST" + task) 
         this.props.day.get("tasks").unshift(0)
         this.props.day.get("tasks")[0] = task
         this.props.day.save()
@@ -54,14 +53,14 @@ var DayElement = React.createClass({displayName: "DayElement",
     takePhotoPressed: function() {
         var video = document.querySelector('#video')
         var canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width; canvas.height = height;
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
         var originalData = canvas.toDataURL(imageContentType)
         var strippedData = originalData.substring(originalData.indexOf(',')+1);
         var jsonData = { "base64":strippedData.toString(),"_ContentType":imageContentType};
         var props = this.props
         var serverUrl = 'https://api.parse.com/1/files/' + "dayImage.jpeg";
+        video.pause()
         $.ajax({
             type: "POST",
             beforeSend: function(request) {
@@ -141,8 +140,8 @@ var DayElement = React.createClass({displayName: "DayElement",
                 React.createElement("div", {className: "dayImageContainer"}, 
                     videoElement, 
                     imageElement, 
-                    React.createElement("button", {type: "button", className: "btn btn-default captureButton", "aria-label": "Left Align", onClick: this.startCapturePressed}, 
-                        React.createElement("span", {className: "fa fa-camera", "aria-hidden": "true"})
+                    React.createElement("button", {type: "button", className: "captureButton", onClick: this.startCapturePressed}, 
+                        React.createElement("span", {className: "fa fa-camera fa-3x", "aria-hidden": "true"})
                     )
                 ), 
                 React.createElement(TaskEntryElement, {onTaskSubmit: this.handleTaskSubmit}), 

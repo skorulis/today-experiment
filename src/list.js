@@ -1,7 +1,7 @@
 
 navigator.getMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 var width = 320
-var height
+var height = 240
 var imageContentType = "image/jpeg"
 
 var TaskEntryElement = React.createClass({
@@ -14,7 +14,7 @@ var TaskEntryElement = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.handleSubmit}>
-                    <input type="text" name="newTask" ref="newTask" tabIndex="1" className="form-control" placeholder="Add something" defaultValue="" />
+                <input type="text" name="newTask" ref="newTask" tabIndex="1" className="form-control" placeholder="Add something" defaultValue="" />
             </form>
     );}
 });
@@ -27,8 +27,8 @@ var TaskElement = React.createClass({
     },
     render: function() {
         return (
-            <li>{this.props.text}
-                <button type="button" className="btn btn-default" aria-label="Left Align" onClick={this.deletePressed}>
+            <li className="taskItem">{this.props.text}
+                <button type="button" className="btn btn-default taskDelete" aria-label="Left Align" onClick={this.deletePressed}>
                         <span className="fa fa-minus-circle" aria-hidden="true"></span>
                     </button>
             </li>
@@ -40,7 +40,6 @@ var DayElement = React.createClass({
         return {recording:false}
     },
     handleTaskSubmit: function(task) {
-        console.log("TEST" + task) 
         this.props.day.get("tasks").unshift(0)
         this.props.day.get("tasks")[0] = task
         this.props.day.save()
@@ -54,14 +53,14 @@ var DayElement = React.createClass({
     takePhotoPressed: function() {
         var video = document.querySelector('#video')
         var canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width; canvas.height = height;
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
         var originalData = canvas.toDataURL(imageContentType)
         var strippedData = originalData.substring(originalData.indexOf(',')+1);
         var jsonData = { "base64":strippedData.toString(),"_ContentType":imageContentType};
         var props = this.props
         var serverUrl = 'https://api.parse.com/1/files/' + "dayImage.jpeg";
+        video.pause()
         $.ajax({
             type: "POST",
             beforeSend: function(request) {
@@ -141,8 +140,8 @@ var DayElement = React.createClass({
                 <div className="dayImageContainer">
                     {videoElement}
                     {imageElement}
-                    <button type="button" className="btn btn-default captureButton" aria-label="Left Align" onClick={this.startCapturePressed}>
-                        <span className="fa fa-camera" aria-hidden="true"></span>
+                    <button type="button" className="captureButton" onClick={this.startCapturePressed}>
+                        <span className="fa fa-camera fa-3x" aria-hidden="true"></span>
                     </button>
                 </div>
                 <TaskEntryElement onTaskSubmit={this.handleTaskSubmit} />
