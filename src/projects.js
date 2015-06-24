@@ -1,33 +1,27 @@
 Parse.initialize(parseId, parseKey);
 
+var ProjectList = React.createClass({
+   render: function() {
+        return (
+            <div>TEST</div>
+            );
+   }
+});
+
 var PageContent = React.createClass({
     getInitialState: function() {
         console.log("User " + Parse.User.current())
         return { currentUser: Parse.User.current() };
-    },
-    handleLogin: function(user) {
-        this.setState({ currentUser: Parse.User.current() })
-		console.log("register " + user)			
     },
     handleLogout: function() {
         Parse.User.logOut();
         this.setState({currentUser:null})
     },
   render: function() {
-      var mainView;
-      console.log("main " + this.state.currentUser)
-        if(this.state.currentUser != null) {
-            mainView = <ContentList user={this.state.currentUser} />
-        } else {
-            mainView = <UserForm onLogin={this.handleLogin}/>    
-        }
-      
     return (
         <div>
             <HeaderElement user={this.state.currentUser} onLogout={this.handleLogout} />
-            <div className="content">
-                {mainView}
-            </div>
+            <ProjectList />
         </div>
     );
   }

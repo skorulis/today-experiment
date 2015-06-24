@@ -1,3 +1,7 @@
+var parseId = "obDHGL7K1Fmen951R5ezXvECakKrVVeCg3fNwLYg"
+var parseKey = "MSgkDUlpCg4mlDNcva1VjAcZoLVXLHPBHA286omP"
+var parseAPIKey = "W6ZiXjTuOPBpILFGKS9Z0DrI2sYNJVqGy7wrtGd3"
+
 var HeaderElement = React.createClass({displayName: "HeaderElement",
     logoutPressed: function(e) {
         e.preventDefault()  
