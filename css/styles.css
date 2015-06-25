@@ -132,3 +132,8 @@
 	background-color: #1CA347;
 	border-color: #1CA347;
 }
+
+.content {
+    padding-left: 10px;
+    padding-right: 10px;
+}
