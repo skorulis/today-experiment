@@ -1,3 +1,7 @@
+var Project = Parse.Object.extend("Project", {
+    
+});
+
 var Day = Parse.Object.extend("Day", {
     dateYesterday: function() {
         var date = this.get("date")
